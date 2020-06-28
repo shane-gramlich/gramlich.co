@@ -13,20 +13,8 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.env.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        env:
-          - name: linux
-            os: ubuntu-latest
-            arch: linux-x86_64
-          - name: mac
-            os: macos-latest
-            arch: darwin64-x86_64-cc
-          - name: win
-            os: windows-latest
-            arch: VC-WIN64A
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
