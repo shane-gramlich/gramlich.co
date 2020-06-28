@@ -1,0 +1,52 @@
+# Continuous Integration and Deployment Script
+#
+# Runs a series of GitHub Actions to build and test the gramlich.co website.
+# Successful builds are deployed to a S3 bucket on AWS.
+---
+name: gramlich.co
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  page_build:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.env.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - name: linux
+            os: ubuntu-latest
+            arch: linux-x86_64
+          - name: mac
+            os: macos-latest
+            arch: darwin64-x86_64-cc
+          - name: win
+            os: windows-latest
+            arch: VC-WIN64A
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+      - name: Install dependencies
+        run: |
+          cd app
+          npm install
+      - name: Build Project
+        run: |
+          cd app
+          npm run build
+          npm run export
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          SOURCE_DIR: "app/dist"
+          DEST_DIR: "/"
