@@ -2,6 +2,13 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   /*
+   ** Prepend 'dist' directory if generating static website files otherwise
+   ** compile files relative to the root directory in order for Dev Tools to work
+   */
+  router: {
+    base: process.env.DEPLOY_ENV === 'STATIC' ? '/app/dist/' : '/'
+  },
+  /*
    ** Nuxt rendering mode
    ** See https://nuxtjs.org/api/configuration-mode
    */
